@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+body{
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+} img{
+  display: block;
+  width: 100%;
+  height: auto;
+}
+a{
+  text-decoration: none;
+  margin: 20px;
+}
+html{
+  font-size: 80%;
+}
+ul{
+  list-style: none;
+}
+.container{
+  max-width: 1200px;
+  width: 100%;
+  height: auto;
+  margin: 0 auto;
+}   
+.header-main {
+  background-color:white;
+
+}
+img {
+  width: 110px;
+  height: auto;
+  display: block !important;
+  margin-left: 5px;
+}
+.search-box {
+  position: relative;    
+}
+
+.search-box span .fa {
+  position: absolute;
+  right: -100px;
+  top: -4px;
+  color: #6b6b6b;
+  font-size: 15px;
+}
+
+.section-two main-flex {
+  margin: 10px;
+  padding: 0px 10px 0px 10px;
+  
+}
+.main-flex{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.symbol{
+  clear: left;
+    display: block;
+    overflow: hidden;
+    padding: 4px;
+}
+.fa {
+  display: grid;
+  font: normal normal normal 14px/1 FontAwesome;
+  color: blue;
+  clear: left;
+  padding-right: 4px;
+  overflow: hidden;
+}
+.main-banner{
+  background-image: url(../images/hlooowebp.webp);
+   height: 350px;
+  background-size: cover;
+  width: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  position: relative;
+  
+}
+.content {
+  position: absolute;
+  top: 50%;
+  left: 20%;
+  color:black;
+
+}
+
+.content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  color: black;
+  font-style: italic;
+  transform: translate(-50%,-50%);
+}

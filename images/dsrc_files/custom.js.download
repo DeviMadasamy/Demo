@@ -1,0 +1,1238 @@
+var existingFiles = [];
+function displayMarketdata(){
+	jQuery(".marketsummary").css('display','block');
+	jQuery(".marketsummary").css('padding','10px');
+	jQuery(".marketsummary").html('<center><img src="'+siteURL+'/wp-content/plugins/dsrc-investors/assets/image/ui-anim_basic.gif" alt="Loading..." /></center>');
+	var stockId = jQuery("#rta_id").val();		
+	var formData =  {'action':'refresh_market_summary','stockId':stockId};
+	jQuery.ajax({
+		type: "POST",
+		url: siteURL+"/wp-admin/admin-ajax.php",
+		dataType: 'html',
+		data: formData,
+		success: function(data) {
+			if(data){
+				jQuery(".marketsummary").html(data);	
+				jQuery(".marketsummary").css('display','block');
+			} else {
+				jQuery(".marketsummary").css('display','none');
+			}					
+		}
+	});
+}
+function helpview(){
+	jQuery("#dialog-latest-enquiry").dialog({title:"TAX FORMS"});				
+	jQuery("#dialog-latest-enquiry .modal-body").html('<p>How to login and send your Enquiry/Complaint:</p><ol><li>Select your company (eg.: Bharat Petroleum Corporation Limited) from the drop-down menu.</li><li>Enter your folio or ClientID/DP ID as the case may be.</li><li>Enter your name exactly as in your share certificate.</li><li>If the data you have provided matches successfully with the master available with the Registrar and Share Transfer Agent (RTA), you will be taken to the next step.</li><li>Select your Type of enquiry from the drop-down menu.</li><li>Enter your enquiry/complaint in the Message box.</li><li>Attach your supporting documents where necessary. Kindly&nbsp; ensure that all the attached documents are self attested and signed by the principal share holder. Further action will be taken by the RTA only if your signature matches with the signature available with the RTA.</li></ol><p><strong>THE CONTACT DETAILS ARE AVAILABLE ON THE FACING PAGE. FOR ANY ASSISTANCE, CALL OR WRITE TO YOUR ACCOUNT MANAGER, MENTIONING THE NAME OF THE COMPANY YOU HOLD THE SHARES IN.</strong></p>');
+	jQuery("#dialog-latest-enquiry").dialog("open");
+}
+function enquiry_now(rtaId, Invertitle) {
+	jQuery('.systemgenerate').addClass('hide');
+	jQuery("#dsrcrta_enquiry #rta_id").val(rtaId);
+	jQuery("#dsrcrta_enquiry #rta_title").val(Invertitle);
+	displayMarketdata();
+	jQuery("#dsrcrta_enquiry .modal-title").text(Invertitle+' ENQUIRY');
+	jQuery("#collection-form input").prop('readonly',false);
+	jQuery("#dsrcrta_enquiry .autopopulate").addClass("hide");
+	jQuery('#collection-form').find("label.error").remove();
+	jQuery('#collection-form').find(".error").removeClass('error');
+	jQuery("#dsrcrta_enquiry").modal('show');
+	jQuery(".preview").html('<p>No file(s) chosen</p>');
+	jQuery("#dsrcrta_enquiry #filename").val('');	
+	/*jQuery.sessionTimeout({
+		  // custom warning message
+		  message: '4 minutes of inactivity is detected, you will be logged out of this session in the next 1 minute',
+		  // 4 minutes
+		  warnAfter: 240000, 
+		  // 5 minutes
+		  redirAfter: 300000, 
+		  redirUrl: window.location.href ,
+		  logoutUrl: window.location.href, 
+		  // appends time stamp to keep alive url to prevent caching
+		  appendTime: true 		  
+	});*/
+}
+
+
+function deleteAttachment(f) {
+  var imagePath = jQuery(f).parent().parent('.row').find('img').attr('src');
+  jQuery(f).parent().parent('.row').remove();
+  var removedFile = jQuery(f).parent().parent('.row').find('.filename').text();
+  existingFiles = existingFiles.filter(function(value){
+	  return value != removedFile;
+  })  
+}
+
+function formclear(){
+	jQuery('#collection-form input').prop('readonly',false);
+	jQuery("#dsrcrta_enquiry .autopopulate .form-group").removeClass("hide"); 
+	jQuery("#dsrcrta_enquiry input[type='text']").val('');
+    if(jQuery('.optiontype:checked').val()=='clientid') {	
+		jQuery("#collection-form .optiontype").eq(0).trigger('click');	
+	} else {
+		jQuery("#collection-form .optiontype").eq(1).trigger('click');	
+		jQuery("#collection-form .optiontype").eq(0).trigger('click');	
+	}
+	
+}
+function pageHtmlPdf(elementId){
+	const element = document.getElementById(elementId);
+	jQuery('.systemgenerate').removeClass('hide');
+	const opt = {
+		margin: 1,
+		filename: 'DSRC-BPM.pdf',
+		image: {type: 'jpeg', quality: 0.90},
+		enableLinks:true,
+		pagebreak: {mode: 'css', before: '.page-break', avoid: 'p'},
+		html2canvas: {scale: 1, scrollY: 0, logging: true, dpi: 192, letterRendering: true},
+		jsPDF: {unit: 'mm', format: 'a4', orientation: 'portrait'},
+	};
+	html2pdf().set(opt).from(element).save();
+    setTimeout(function(){jQuery('.systemgenerate').addClass('hide');},3000);
+    jQuery('#dsrcrta_dividand_enquiry').modal('hide');	
+}
+function printPage(elementId){
+	jQuery('.systemgenerate').removeClass('hide');
+	var prtContent = document.getElementById(elementId);
+	var WinPrint = window.open(' ', ' ', 'left=0,top=0,width=800,height=900,toolbar=0,scrollbars=0,status=0');
+		WinPrint.document.write('<html><head><title>DSRC BPM</title>');
+		WinPrint.document.write('<link rel="stylesheet" href="'+siteURL+'/wp-content/themes/sway/core/assets/css/bootstrap.min.css" />');
+		WinPrint.document.write('<link rel="stylesheet" href="'+siteURL+'/wp-content/plugins/dsrc-investors/assets/css/custom.css" />');
+		WinPrint.document.write('</head><body>');
+		WinPrint.document.write(prtContent.innerHTML);
+		WinPrint.document.write('</body></html>');
+		WinPrint.document.close();
+		setTimeout(function () {
+           WinPrint.focus();
+		   WinPrint.print();
+		   WinPrint.close();
+		   jQuery('.systemgenerate').addClass('hide');
+        }, 500);
+		jQuery('#dsrcrta_dividand_enquiry').modal('hide');	
+}
+
+function formkycsubmit(){		
+	if(jQuery('form#kycupdate').valid()){	
+		var formData = jQuery('form#kycupdate').serialize();
+		jQuery.ajax({
+			type: "POST",
+			url: siteURL+"/wp-admin/admin-ajax.php",
+			dataType: 'json',
+			data: formData,
+			success: function(data) {
+				jQuery("#dsrcrta_enquiry #kyc_updated_ref").val(data.refId);			
+			}
+		});
+		
+		jQuery('form#kycupdate .ifscvalidate').hide();
+		jQuery('form#kycupdate .inline-edit').hide();
+		jQuery('#kyc-section').css('font-size','12px');
+		const element = document.getElementById('kyc-section');
+		const opt = {
+			margin: 1,
+			filename: 'KYC.pdf',
+			image: {type: 'jpeg', quality: 0.90},
+			enableLinks:true,
+			pagebreak: {mode: 'css', before: '.page-break', avoid: 'p'},
+			html2canvas: {scale: 1, scrollY: 0, logging: true, dpi: 192, letterRendering: true},
+			jsPDF: {unit: 'mm', format: 'a4', orientation: 'portrait'},
+		};
+		html2pdf().set(opt).from(element).save();
+		jQuery('#dsrcrta_kyc_form').modal('hide');
+	}
+}
+
+function printkycform(){
+	if(jQuery('form#kycupdate').valid()){
+		jQuery('form#kycupdate .ifscvalidate').hide();
+		jQuery('form#kycupdate .inline-edit').hide();
+		jQuery('#kyc-section').css('font-size','11px');
+		var prtContent = document.getElementById("kyc-section");		
+		var formData = jQuery('form#kycupdate').serialize();
+		jQuery.ajax({
+			type: "POST",
+			url: siteURL+"/wp-admin/admin-ajax.php",
+			dataType: 'json',
+			data: formData,
+			success: function(data) {
+				jQuery("#dsrcrta_enquiry #kyc_updated_ref").val(data.refId);			
+			}
+		});
+		var WinPrint = window.open(' ', ' ', 'left=0,top=0,width=800,height=900,toolbar=0,scrollbars=0,status=0');
+		WinPrint.document.write('<html><head><title>DSRC BPM</title>');
+		WinPrint.document.write('<link rel="stylesheet" href="'+siteURL+'/wp-content/themes/sway/core/assets/css/bootstrap.min.css" />');
+		WinPrint.document.write('<link rel="stylesheet" href="'+siteURL+'/wp-content/plugins/dsrc-investors/assets/css/custom.css" />');
+		WinPrint.document.write('</head><body>');
+		WinPrint.document.write(prtContent.innerHTML);
+		WinPrint.document.write('</body></html>');
+		WinPrint.document.close();
+		setTimeout(function () {
+           WinPrint.focus();
+		   WinPrint.print();
+		   WinPrint.close();
+        }, 500);		
+		
+	}
+}
+function upperCasewithboxed(element){
+	
+	var curvalue = element.value.toUpperCase();
+	element.value=element.value.toUpperCase();
+	var inputId = jQuery(element).attr('id');
+	var inputpattern = /([A-Z]{5})([0-9]){4}([A-Z]){1}$/;
+	var minval = 10;
+	if(inputId == 'demataccount'){
+		var inputpattern = /^[INin0-9]*$/;
+		var minval = 16;
+	}
+	var splitStr='<input id="'+inputId+'" type="hidden" class="form-control" onblur="upperCasewithboxed(this)" name="'+inputId+'" value="'+curvalue+'" />';
+	var arr = curvalue.split("");
+	for (var i = 0; i < arr.length; i++) {
+        splitStr+='<span class="box">'+arr[i]+'</span>';
+    }	
+	splitStr+='<span class="fa fa-pencil inline-edit"></span>';
+	if(inputpattern.test(curvalue) && curvalue.length == minval){
+		jQuery(element).parent().html(splitStr);
+	}
+}
+function textAreaAdjust(element) {
+  element.style.height = "1px";
+  element.style.height = (15+element.scrollHeight)+"px";
+  document.getElementById("dsrcrta_enquiry_modal_body").scrollTop = document.getElementById("dsrcrta_enquiry_modal_body").scrollHeight+element.scrollHeight;
+  
+}
+
+function readURL(input){
+	for(var i=0; i<input.files.length;i++){
+		if(input.files[i]){
+			var reader = new FileReader();
+			var fileType = input.files[i].type;		
+			if(fileType =='application/pdf'){
+				reader.onload = function(e){
+					var imageUpload = jQuery('<i class="fa fa-file-pdf fa-3x" alt="PDF"/>');
+					imageUpload.appendTo(".preview");
+			    }
+			    reader.readAsDataURL(input.files[i]);
+			} else {
+				reader.onload = function(e){
+					var imageUpload = jQuery('<img class="img-thumbnail" height="50px" width="50px" alt="PDF"/>');
+					imageUpload.attr('src',e.target.result);				
+				    imageUpload.appendTo(".preview");
+					//jQuery(".preview").html(imageUpload);
+				}
+			    reader.readAsDataURL(input.files[i]);
+			}
+		} else {
+			 toastr.error("Please select file");
+			 return false;	
+		}
+	}	
+}
+
+
+function validatename() {
+	if(jQuery('form#collection-form').valid()){			
+	jQuery('#spinner-div').show();		
+	jQuery('#collection-form input').prop('readonly',false);
+	jQuery("#dsrcrta_enquiry .autopopulate .form-group").removeClass("hide");
+	if(jQuery('.optiontype:checked').val()=='clientid') {
+		var folionumber = '';
+        var name = jQuery('#collection-form #cid').val();
+	} else {
+		var folionumber = jQuery('#collection-form #folionumber').val();
+        var name = '';
+	}    
+    var customer_name = jQuery('#collection-form #name').val();	
+	var company_id = jQuery('#collection-form #rta_id').val()	
+
+	//var formData = jQuery('#validate-form').serialize();
+	var formData =  {'action':'collection_form_data_auto_populate', 'company_id':company_id, 'folionumber':folionumber, 'name':name, 'customer_name':customer_name};	
+	var dbexistingData = '';
+	jQuery.ajax({
+		type: "POST",
+		url: siteURL+"/wp-admin/admin-ajax.php",
+		dataType: 'json',
+		data: formData,
+		success: function(data) {
+			jQuery('#spinner-div').hide();	
+			if(data.status == 1 ) {						
+				//toastr.success(data.message);
+				jQuery("#dsrcrta_enquiry .autopopulate input, #dsrcrta_enquiry .autopopulate textarea").val('');
+				jQuery("#collection-form #dbemail").val(data.data.customer_email);
+				jQuery("#collection-form #dbpancard").val(data.data.customer_pan);						
+				jQuery("#collection-form #dbclid").val(data.data.cid);						
+				jQuery("#collection-form #cid").val(data.data.cid);						
+				jQuery("#collection-form #dbfolionumber").val(data.data.customer_folionum);						
+				jQuery("#collection-form #folionumber").val(data.data.customer_folionum);						
+				jQuery("#collection-form #emailaddress").val(data.data.customer_email);
+				jQuery("#validate-form #validateclid").val(data.data.cid);
+				jQuery("#validate-form #validatefolionumber").val(data.data.customer_folionum);
+				jQuery("#collection-form #folionumber").prop('readonly',true);
+				jQuery("#collection-form #name").prop('readonly',true);
+				jQuery("#collection-form #cid").prop('readonly',true);
+				if(data.data.customer_email){
+					jQuery("#collection-form #emailaddress").prop('readonly',true);
+					jQuery("#collection-form #emailaddress").parent('.form-group').addClass("hide");
+					dbexistingData+=', Email';
+				} else {
+					jQuery("#dialog-email").dialog('open');
+				}
+				jQuery("#collection-form #name").val(data.data.customer_name);				
+				jQuery("#collection-form #pancard").val(data.data.customer_pan);
+				if(data.data.customer_pan){
+					jQuery("#collection-form #pancard").prop('readonly',true);
+					jQuery("#collection-form #pancard").parent('.form-group').addClass("hide");
+					dbexistingData+=', PAN';
+				} 
+				jQuery("#collection-form #mobilenumber").val(data.data.customer_phone);
+				if(data.data.customer_phone){
+					jQuery("#collection-form #mobilenumber").prop('readonly',true);
+					jQuery("#collection-form #mobilenumber").parent('.form-group').addClass("hide");
+					dbexistingData+=', Mobile Number';
+				} 
+				dbexistingData = jQuery.trim(dbexistingData.replace(/^,+|,+$/g, ''));
+				if(dbexistingData){
+					jQuery("#dsrcrta_enquiry .dataexists").html('<p class="form-group col-md-12"><i class="fa fa-info-circle"></i> Your '+dbexistingData+' already exists in the master.</p>');
+				}
+				
+				jQuery("#dsrcrta_enquiry .autopopulate").removeClass("hide");
+				//jQuery("#dsrcrta_enquiry_validate").modal('hide');
+			} else {
+				toastr.error(data.message);
+				jQuery('#collection-form #name,#collection-form #cid #collection-form #folionumber').val('');
+			}
+		}
+	});
+	}
+	return false;	
+}
+
+function formenquirysubmit(){
+	if(jQuery('form#collection-form').valid()){
+		jQuery('#spinner-div').show();
+		var formData = new FormData(jQuery('form#collection-form')[0]);
+		var fileName = '';
+		jQuery('.preview').find('.img-thumbnail').each(function(){
+			fileName +=jQuery(this).attr('src');
+		});
+		formData.append('filename',fileName);
+		//var formData = jQuery('form#collection-form').serialize();
+		jQuery.ajax({
+			type: "POST",
+			url: siteURL+"/wp-admin/admin-ajax.php",
+			dataType: 'json',
+			data: formData,
+			cache: false,
+			contentType: false,
+			enctype: 'multipart/form-data',
+			processData: false,
+			success: function(data) {
+				jQuery('#spinner-div').hide();
+				if(data.status == 1 ) {
+					jQuery('form#collection-form')[0].reset();
+					jQuery("#dsrcrta_enquiry .autopopulate").addClass("hide");
+					jQuery("#dsrcrta_enquiry").modal('hide');					
+					toastr.success(data.message);
+					setTimeout(function() { location.reload();}, 5000);
+				} else {
+					toastr.error(data.message);
+				}
+			}
+		});
+	}
+	return false;
+}
+(function($) {
+    $(function() {
+		
+		$("#dialog-email").dialog({
+			autoOpen: false,
+			open: function () {
+				var closeBtn = $('.ui-dialog-titlebar-close');
+				closeBtn.append('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
+			},
+			close: function () {
+				var closeBtn = $('.ui-dialog-titlebar-close');
+				closeBtn.html('');
+			},
+			width: 400,
+			modal: true,
+			buttons: {
+				OK: function() {
+				  $(this).dialog("close");
+				}
+			}
+		});
+		
+		$("#dialog-latest-enquiry").dialog({
+			autoOpen: false,
+			open: function () {
+				var closeBtn = $('.ui-dialog-titlebar-close');
+				closeBtn.append('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
+			},
+			close: function () {
+				var closeBtn = $('.ui-dialog-titlebar-close');
+				closeBtn.html('');				
+			},
+			width: '70%',
+			modal: true,
+			buttons: {
+				OK: function() {
+				  $("#dialog-message").dialog("open");
+				}
+			}
+		});
+		
+		$("#dialog-message").dialog({
+			autoOpen: false,
+			open: function () {
+				var closeBtn = $('.ui-dialog-titlebar-close');
+				closeBtn.append('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
+			},
+			close: function () {
+				var closeBtn = $('.ui-dialog-titlebar-close');
+				closeBtn.html('');
+			},
+			width: 400,
+			modal: true,
+			buttons: {
+				OK: function() {
+				  $(this).dialog("close");
+				  $("#dialog-latest-enquiry").dialog("close");
+				}
+			}
+		});
+		$("#dialog-notice").dialog({
+			autoOpen: false,
+			open: function () {
+				var closeBtn = $('.ui-dialog-titlebar-close');
+				closeBtn.append('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
+			},
+			close: function () {
+				var closeBtn = $('.ui-dialog-titlebar-close');
+				closeBtn.html('');
+			},
+			width: '70%',
+			modal: true,
+			buttons: {
+				OK: function() {
+				  $(this).dialog("close");
+				  $("#dialog-latest-enquiry").dialog("close");
+				}
+			}
+		});
+		
+		$("#dialog-pf").dialog({
+			autoOpen: false,
+			open: function () {
+				var closeBtn = $('.ui-dialog-titlebar-close');
+				closeBtn.append('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
+			},
+			close: function () {
+				var closeBtn = $('.ui-dialog-titlebar-close');
+				closeBtn.html('');
+			},
+			width: '70%',
+			modal: true,
+			buttons: {
+				OK: function() {
+				  $(this).dialog("close");
+				}
+			}
+		});
+		
+		if ($('#inversterslist').length > 0) {
+			$('#inversterslist').select2({
+				placeholder: 'Select Company'
+			});
+			$('#inversterslist').on('change',function(){
+				var rtaId = $(this).find(':selected').data('rtaid');
+				var Invertitle = $(this).find(':selected').data('rtatitle');
+				$(".folionumber").removeClass("hide");
+				$(".inputclid").addClass("hide");
+				$("#dsrcrta_enquiry .dataexists").html('');				
+				$('form#collection-form')[0].reset();				
+				$('#inversterslist').val(0);
+				$('#inversterslist').select2({
+					placeholder: 'Select Company'
+				});
+				enquiry_now(rtaId, Invertitle);
+				$('#collection-form').find("label.error").remove();
+				$('#collection-form').find(".error").removeClass('error');			
+
+			});
+		}		
+		$("#name").autocomplete({
+			source: function( request, response ) {
+				$.ajax({
+				  url: siteURL+"/wp-admin/admin-ajax.php",
+				  data: {
+					term: request.term,
+					action:'ui_name_autocomplete',
+					folionumber:$('#collection-form #folionumber').val(),
+					cid:$('#collection-form #cid').val(),				
+					company_id:$('#collection-form #rta_id').val()				
+				  },
+				  dataType: "json",				  
+				  success: function( data ) {
+					response(data);
+					if (data.length === 0) {			
+                       toastr.error("This account not associated with this company");
+					}
+				  }
+				});
+			},
+			minLength:2
+		});
+		
+		$('.noticepopup').on('click',function(){			
+			$("#dialog-notice").dialog('open');
+		});
+		
+		$('#collection-form .optiontype').on('change',function(){
+			$("#collection-form input").prop('readonly',false);
+			$("#collection-form #enquirytype").val('');
+			$("#collection-form #message").val('');
+			if($(this).val()=='clientid') {
+				$(".folionumber").addClass("hide");
+				$("#folionumber").val('');
+				$("#cid").val('');
+				$("#name").val('');
+				$(".inputclid").removeClass("hide");
+				
+				$('#collection-form #enquirytype option[value="1"]').addClass('hide');
+				$('#collection-form #enquirytype option[value="2"]').addClass('hide');
+				$('#collection-form #enquirytype option[value="3"]').addClass('hide');
+				$('#collection-form #enquirytype option[value="9"]').addClass('hide');
+				$('#collection-form #enquirytype option[value="10"]').addClass('hide');
+				
+			} else {
+				$(".folionumber").removeClass("hide");
+				$(".inputclid").addClass("hide");
+				$("#folionumber").val('');
+				$("#cid").val('');
+				$("#name").val('');
+				
+				$('#collection-form #enquirytype option[value="1"]').removeClass('hide');
+				$('#collection-form #enquirytype option[value="2"]').removeClass('hide');
+				$('#collection-form #enquirytype option[value="3"]').removeClass('hide');
+				$('#collection-form #enquirytype option[value="9"]').removeClass('hide');
+				$('#collection-form #enquirytype option[value="10"]').removeClass('hide');
+			}			
+			$(".autopopulate").addClass("hide");
+			$("#dsrcrta_enquiry .dataexists").html('');	
+			$('#collection-form').find("label.error").remove();			
+			$('#collection-form').find(".error").removeClass('error');
+	        $(".preview").html('<p>No file(s) chosen</p>');
+			$("#dsrcrta_enquiry #filename").val('');			
+		});				
+		$('#collection-form #signeddocument').on('change',function(e){
+			var input = this;
+			$(".preview p").html('');				
+			for(var i=0; i<input.files.length;i++){
+				var fileType = input.files[i].type;			
+				var fileSize = input.files[i].size;
+				var fileName = input.files[i].name;
+                var fileNameExt = fileName.substr(fileName.lastIndexOf('.') + 1);
+                var allowedExtArray = ['png','jpg','jpeg','gif','pdf'];
+				if(fileSize < 1048576){
+					 var fsws = Math.abs(fileSize/1024).toFixed(1) + 'KB';
+				} else{
+					 var fsws = Math.abs(fileSize/1048576).toFixed(1) + 'MB';  
+				}			
+				if($.inArray(fileNameExt,allowedExtArray)===-1){
+					toastr.error("Please upload valid file formats(Only image format (png/jpg/jpeg/gif/pdf) is allowed)");
+					return false;	
+				} else if (fileSize>2000000){
+					toastr.error("File size must be less than 2MB");
+					return false;	
+				} else if($.inArray(fileName,existingFiles)!==-1){
+					toastr.error("File already attached, Please change file and try to upload the file again");
+					return false;	
+				} else {
+					$('#spinner-div').show();
+					var formData = new FormData();
+					formData.append('signeddocument',input.files[i]);
+					formData.append('action','enquiry_file_save');
+					$.ajax({
+						type: "POST",
+						url: siteURL+"/wp-admin/admin-ajax.php",
+						dataType: 'json',
+						data: formData,
+						cache: false,
+						contentType: false,
+						enctype: 'multipart/form-data',
+						processData: false,
+						success: function(data) {
+							$('#spinner-div').hide();
+							if(data.status == 1 ) {
+								if(fileNameExt=='pdf'){
+									var imageUpload = $('<div class="row"><div class="col-md-3"><i src="'+data.data.url+'" class="fa fa-file-pdf fa-4x img-thumbnail" alt="PDF"/></i></div><div class="col-md-6 input-sm filename">'+fileName+'</div><div class="col-md-2 input-sm">'+fsws+'</div><div class="col-md-1"><i onclick="deleteAttachment(this)" class="fa fa-trash" alt="delete"/></i></div></div>');
+									imageUpload.appendTo(".preview");
+								} else {
+									var imageUpload = $('<div class="row"><div class="col-md-3"><img src="'+data.data.url+'" class="img-thumbnail"/></div><div class="input-sm col-md-6 filename">'+fileName+'</div><div class="col-md-2 input-sm">'+fsws+'</div><div class="col-md-1"><i onclick="deleteAttachment(this)" class="fa fa-trash" alt="delete"/></i></div></div>');
+									imageUpload.appendTo(".preview");
+								}
+								existingFiles.push(fileName);
+							} else {
+								toastr.error(data.message);
+							}
+						}
+					}); 
+				}
+			}
+		});
+		
+		$.validator.addMethod('filesize', function (value, element, param) {
+			return this.optional(element) || (element.files[0].size <= param * 1048576)
+		}, 'File size must be less than {0} MB');
+		
+		$.validator.addMethod('maxfilenumber', function (value, element, param) {
+			return this.optional(element) || (element.files.length <= param)
+		}, 'Number of file must be less than {0}');
+		
+		$.validator.addMethod('indcustomphone', function (value, element){
+  				return /^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$/.test(value);
+		}, "Please enter a valid phone number");
+		
+		$.validator.addMethod("emaildomain", function(value, element) {
+				return /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.((com)|(in)|(co.in))$/.test(value);
+			}, "Please enter a valid email address");
+			
+			
+		/*$.validator.addMethod("emaildomain", function(value, element) {	
+		        var atpos = value.indexOf("@");
+				var domain = value.split("@")[1];
+				var allowedDomain = ['gmail.com','yahoo.com','bharatpetroleum.in','dsrc.com','dsrc.co.in','dsrc-cid.in','hotmail.com','aol.com','live.com','rediffmail.com'];
+				return this.optional(element) || (atpos>1 && $.inArray(domain,allowedDomain)!==-1) 
+		}, "Please enter a valid email address");*/
+		
+		$.validator.addMethod("liveemail", function(value, element) {	
+		   $.getJSON("https://isitarealemail.com/api/email/validate?email="+value, function(data) {
+				if(data['status'] == 'valid'){
+					return true;
+				} else {
+					return false;
+				}
+			})
+		}, "Please enter a valid email address");
+		
+		$('#collection-form').validate({
+			normalizer: function( value ) {
+				return $.trim( value );
+			},
+			onblur:true,
+			rules: {
+				name: {
+					required: true,
+					minlength: 1
+				},
+				cid: {
+					required: true,
+					minlength: 16,
+					maxlength: 16
+				},
+				folionumber: {
+					required: true,
+					minlength: 7,
+					maxlength: 7
+				},
+				pancard:{
+					required: true,
+					pattern: /([A-Z]{5})([0-9]){4}([A-Z]){1}$/,
+					minlength: 10,
+					maxlength: 10
+				},
+				message: {
+					required: true,
+					rangeWords:[1, 250]
+				},				
+				emailaddress: {
+					required: true,
+					email: true,					
+					emaildomain: true,					
+					equalTo: {
+						param: '#dbemail',
+						depends: function(element) { 
+							return $("#dbemail").val() != ''; 
+						}
+					}
+				},
+				enquirytype:'required',				
+				mobilenumber: {
+					required: true,
+					indcustomphone: true,
+				},
+				'signeddocument': {
+					extension: "png|jpg|jpeg|gif|pdf",					
+					required:{
+						depends: function(element) {
+							var enquiryTypeSelected = $("#enquirytype").find(':selected').data('code');							
+							return enquiryTypeSelected == 'K' || enquiryTypeSelected == 'Y' || $("#dbpancard").val() != $("#pancard").val(); 
+						}
+					}
+				},
+			},
+			messages: {
+				name: {
+					required: "Please enter name of the principal shareholder",
+				},
+				folionumber: {
+					required: "Please enter your folio number",
+					minlength:"Please enter 7 characters",
+					maxlength:"Please enter 7 characters",
+				},
+				cid: {
+					required: "Please enter your DpID/ClientID",
+					minlength:"Please enter 16 characters",
+					maxlength:"Please enter 16 characters"
+				},
+				'signeddocument': {
+					required: function(element) {						
+						var enqCode = $("#enquirytype").find(':selected').data('code');
+						var supportdocumenterr = "Please attach a self-attested copy of your document(Self-attestation is mandatory)";
+						if (enqCode == 'K') {
+							supportdocumenterr = "Please attach duly filled, signed KYC form along with supporting documents";
+                         
+						} else if (enqCode == 'Y') {
+							supportdocumenterr = "Please attach duly filled, signed Claim form along with supporting documents";
+						} 
+						
+						if(($.inArray('Y',['Y','K'])!==-1 || $.inArray('K',['Y','K'])!==-1) &&  $("#dbpancard").val() != $("#pancard").val() ){
+							supportdocumenterr += " and Please attach a self-attested copy of your PAN document(Self-attestation is mandatory)";
+						}
+						return supportdocumenterr;						
+					},
+					extension: "Please upload valid file formats(Only image format (png/jpg/jpeg/gif/pdf) is allowed)",
+					filesize: "Please upload maximum 5 files",
+				},
+				pancard: {
+					required: "Please enter your PAN Number",
+					pattern: "Please enter a valid PAN Number",
+					minlength: "Please enter a valid PAN Number",
+					maxlength: "Please enter a valid PAN Number",
+				},
+				emailaddress: {
+					required: "Please enter your email address",
+					email: "Please enter a valid email address",
+					emaildomain: "Please enter a valid email address",
+					equalTo: "Please provide valid email linked this company account"
+				},
+				mobile: {
+					required: "Please enter a mobile number",					
+					indcustomphone: "Please provide valid mobile number"
+				},
+				message: {
+					required: "Please enter a message",
+					rangeWords:"Please enter a message"
+				}
+			},
+			invalidHandler: function(form, validator) {
+				if (!validator.numberOfInvalids())
+					return;
+				$('html, body').animate({
+					scrollTop: $(validator.errorList[0].element).offset().top
+				}, 1000);
+			}
+		});		
+		$('#collection-form #enquirytype').on('change',function(){
+			
+			//Latest enquiry status
+			jQuery('.systemgenerate').addClass('hide');
+			if($('.optiontype:checked').val()=='clientid') {
+				var folionumber = '';
+				var cid = $('#collection-form #cid').val();
+			} else {
+				var folionumber = $('#collection-form #folionumber').val();
+				var cid = '';
+			} 					
+			
+			var enquiryTypeSelected = $(this).find(':selected').data('code');
+			if(enquiryTypeSelected == 'PF'){
+				$("#dialog-pf").dialog("open");
+			} else if(enquiryTypeSelected == 'MF'){				
+				$("#dialog-latest-enquiry").dialog({title:"TAX FORMS"});		
+				var taxformcontent = '<div class="row"> <div class="col-md-4"> <a  class="text-center" href="'+siteURL+'/wp-content/uploads/2023/01/Form15G.pdf"target="_blank"><b><i class="fa fa-file-pdf-o fa-4x" aria-hidden="true"></i><br>Form15G</b></a></div>';
+				 taxformcontent += '<div class="col-md-4"><a  class="text-center" href="'+siteURL+'/wp-content/uploads/2023/01/Form15H.pdf"target="_blank"><b><i class="fa fa-file-pdf-o fa-4x" aria-hidden="true"></i><br>Form15H</b></a></div>';
+				 taxformcontent += '<div class="col-md-4"><a class="text-center" href="'+siteURL+'/wp-content/uploads/2023/01/Form10F.pdf"target="_blank"><b><i class="fa fa-file-pdf-o fa-4x" aria-hidden="true"></i><br>Form10F</b></a></div></div>';
+				$("#dialog-latest-enquiry .modal-body").html(taxformcontent);
+				$("#dialog-latest-enquiry").dialog("open");
+			} else if( enquiryTypeSelected == 'K' ){		
+			    
+				$("#dsrcrta_kyc_form .modal-body").html('');
+                $('#spinner-div').show();				
+                if($('.optiontype:checked').val()=='clientid') {
+					var folionumber = '';
+					var cid = $('#collection-form #cid').val();
+				} else {
+					var folionumber = $('#collection-form #folionumber').val();
+					var cid = '';
+				} 	
+                var rta_title = $('#collection-form #rta_title').val();				
+				var formData =  {'action':'kyc_update_enquiry','folionumber':folionumber,'cid':cid,'rta_title':rta_title};	
+				
+				$.ajax({
+					type: "POST",
+					url: siteURL+"/wp-admin/admin-ajax.php",
+					dataType: 'html',
+					data: formData,
+					success: function(data) {
+						$('#spinner-div').hide();
+						$("#dsrcrta_kyc_form .modal-body").html(data);
+						$("#dsrcrta_kyc_form").modal('show');
+						$('#kycupdate').validate({
+							normalizer: function( value ) {
+								return $.trim( value );
+							},
+							onblur:true,
+							rules: {
+								'changeoptions[]': {
+									required: function(elem) {
+										return $(".changeoptions:checked").length == 0;
+									}
+								},				
+								email: {
+									required: {
+										depends: function(element) {
+											var changeoptions = [];
+											$.each($(".changeoptions:checked"),function(){
+												changeoptions.push($(this).val());
+											});
+											
+											return $.inArray('Email',changeoptions)!==-1;
+										}
+									},
+									email: {
+										depends: function(element) {
+											var changeoptions = [];
+											$.each($(".changeoptions:checked"),function(){
+												changeoptions.push($(this).val());
+											});
+											
+											return $.inArray('Email',changeoptions)!==-1;
+										}
+									},					
+									emaildomain: {
+										depends: function(element) {
+											var changeoptions = [];
+											$.each($(".changeoptions:checked"),function(){
+												changeoptions.push($(this).val());
+											});
+											
+											return $.inArray('Email',changeoptions)!==-1;
+										}
+									},
+								},
+								pannumber:{
+									required: {
+										depends: function(element) {
+											var changeoptions = [];
+											$.each($(".changeoptions:checked"),function(){
+												changeoptions.push($(this).val());
+											});
+											
+											return $.inArray('PAN',changeoptions)!==-1;
+										}
+									},
+									pattern: /([A-Z]{5})([0-9]){4}([A-Z]){1}$/,
+									minlength: 10,
+									maxlength: 10
+								},			
+								mobile: {
+									required: {
+										depends: function(element) {
+											var changeoptions = [];
+											$.each($(".changeoptions:checked"),function(){
+												changeoptions.push($(this).val());
+											});
+											return $.inArray('Mobile',changeoptions)!==-1;
+										}
+									},
+									indcustomphone: {
+										depends: function(element) {
+											var changeoptions = [];
+											$.each($(".changeoptions:checked"),function(){
+												changeoptions.push($(this).val());
+											});
+											return $.inArray('Mobile',changeoptions)!==-1;
+										}
+									}
+								},
+					            demataccount: {
+									required: {
+										depends: function(element) {
+											var changeoptions = [];
+											$.each($(".changeoptions:checked"),function(){
+												changeoptions.push($(this).val());
+											});
+											return $.inArray('DematAccount',changeoptions)!==-1;
+										}
+									},
+									minlength:16,
+									maxlength:16,
+									pattern: /^[INin0-9]*$/
+								},	
+								accnum: {
+									required: {
+										depends: function(element) {
+											var changeoptions = [];
+											$.each($(".changeoptions:checked"),function(){
+												changeoptions.push($(this).val());
+											});
+											
+											return $.inArray('Bank',changeoptions)!==-1;
+										}
+									},
+									minlength: 3,
+                                    maxlength:16,
+									digits:true
+								},
+								accnumconfirm: {
+									required: {
+										depends: function(element) {
+											var changeoptions = [];
+											$.each($(".changeoptions:checked"),function(){
+												changeoptions.push($(this).val());
+											});
+											
+											return $.inArray('Bank',changeoptions)!==-1;
+										}
+									},	
+								    digits:true,							
+									equalTo:"#accnum"
+								},
+								
+								bankname: {
+									required: {
+										depends: function(element) {
+											var changeoptions = [];
+											$.each($(".changeoptions:checked"),function(){
+												changeoptions.push($(this).val());
+											});
+											return $.inArray('Bank',changeoptions)!==-1;
+										}
+									},
+								},
+								branch: {
+									required: {
+										depends: function(element) {
+											var changeoptions = [];
+											$.each($(".changeoptions:checked"),function(){
+												changeoptions.push($(this).val());
+											});
+											return $.inArray('Bank',changeoptions)!==-1;
+										}
+									}
+								},
+								ifsc: {
+									required: {
+										depends: function(element) {
+											var changeoptions = [];
+											$.each($(".changeoptions:checked"),function(){
+												changeoptions.push($(this).val());
+											});
+											return $.inArray('Bank',changeoptions)!==-1;
+										}
+									}, 
+									pattern: /^[A-Za-z]{4}[A-Za-z0-9]{7}$/,									
+								},	
+                                proofofaddress: {
+									required: {
+										depends: function(element) {
+											var changeoptions = [];
+											$.each($(".changeoptions:checked"),function(){
+												changeoptions.push($(this).val());
+											});
+											return $.inArray('Address',changeoptions)!==-1 && $("input[name='proofofaddress']:checked").length == 0;
+										}
+									}
+								},								
+								nameshareholder1: {
+									required: {
+										depends: function(element) {
+											var changeoptions = [];
+											$.each($(".changeoptions:checked"),function(){
+												changeoptions.push($(this).val());
+											});
+											return $.inArray('Address',changeoptions)!==-1;
+										}
+									}
+								},								
+								nameshareholder1: {
+									required: {
+										depends: function(element) {
+											var changeoptions = [];
+											$.each($(".changeoptions:checked"),function(){
+												changeoptions.push($(this).val());
+											});
+											return $.inArray('Address',changeoptions)!==-1;
+										}
+									}
+								},
+								addressshareholder1: {
+									required: {
+										depends: function(element) {
+											var changeoptions = [];
+											$.each($(".changeoptions:checked"),function(){
+												changeoptions.push($(this).val());
+											});
+											return $.inArray('Address',changeoptions)!==-1;
+										}
+									}
+								},
+								addressshareholder2: {
+									required: {
+										depends: function(element) {
+											var changeoptions = [];
+											$.each($(".changeoptions:checked"),function(){
+												changeoptions.push($(this).val());
+											});
+											return $("#nameshareholder2").val() != '' && $.inArray('Address',changeoptions)!==-1;
+										}
+									}
+								},
+								addressshareholder3: {
+									required: {
+										depends: function(element) {
+											var changeoptions = [];
+											$.each($(".changeoptions:checked"),function(){
+												changeoptions.push($(this).val());
+											});
+											return $("#nameshareholder3").val() != '' && $.inArray('Address',changeoptions)!==-1;
+										}
+									}
+								},							
+								zipcodeshareholder1: {
+									required: {
+										depends: function(element) {
+											var changeoptions = [];
+											$.each($(".changeoptions:checked"),function(){
+												changeoptions.push($(this).val());
+											});
+											return $.inArray('Address',changeoptions)!==-1;
+										}
+									},
+									pattern: /^[a-z0-9][a-z0-9\- ]{0,10}[a-z0-9]$/,
+								},							
+								zipcodeshareholder2: {
+									required: {
+										depends: function(element) {
+											var changeoptions = [];
+											$.each($(".changeoptions:checked"),function(){
+												changeoptions.push($(this).val());
+											});
+											return $("#nameshareholder2").val() != '' && $.inArray('Address',changeoptions)!==-1;
+										}
+									},
+									pattern: /^[a-z0-9][a-z0-9\- ]{0,10}[a-z0-9]$/,
+								},							
+								zipcodeshareholder3: {
+									required: {
+										depends: function(element) {
+											var changeoptions = [];
+											$.each($(".changeoptions:checked"),function(){
+												changeoptions.push($(this).val());
+											});
+											return $("#nameshareholder3").val() != '' && $.inArray('Address',changeoptions)!==-1;
+										}
+									},
+									pattern: /^[a-z0-9][a-z0-9\- ]{0,10}[a-z0-9]$/,
+								}	
+							},
+							messages: {				
+								'changeoptions[]': {
+									required: "You must select at least one KYC update option!"
+								},				
+								pannumber: {
+									required: "Please enter your PAN Number",
+									pattern: "Please enter a valid PAN Number",
+									minlength: "Please enter a valid PAN Number",
+									maxlength: "Please enter a valid PAN Number",
+								},
+								email: {
+									required: "Please enter your email address",
+									email: "Please enter a valid email address",
+									emaildomain: "Please enter a valid email address"
+								},
+								mobile: {
+									required: "Please enter a mobile number",					
+									indcustomphone: "Please provide valid mobile number"
+								},
+								demataccount: {
+									required: "Please enter a demat account number",					
+									minlength: "Please provide valid demat account number",
+									maxlength: "Please provide valid demat account number",
+									pattern: "Please provide valid demat account number",
+								},
+								accnum: {
+									required: "Please enter a account number",
+									minlength: "Please enter a valid account number",																		
+									maxlength: "Please enter a valid account number",																		
+									digits: "Please enter a valid account number",																	
+								},
+								accnumconfirm: {
+									required: "Please reenter the account number",
+									digits: "Please enter a valid account number",
+									equalTo: "Mismatch in Account Number"																	
+								},
+								bankname: {
+									required: "Please enter a bank name",
+								},
+								branch: {
+									required: "Please enter a branch",
+								},
+								ifsc: {
+									required: "Please enter your IFSC Code",
+									pattern: "Please enter a valid IFSC Code"																		
+								},
+								zipcodeshareholder3: {
+									required: "Please enter a postal code",
+									pattern: "Please enter a valid postal code"																		
+								},
+								zipcodeshareholder3: {
+									required: "Please enter a postal code",
+									pattern: "Please enter a valid postal code"																		
+								},
+								zipcodeshareholder3: {
+									required: "Please enter a postal code",
+									pattern: "Please enter a valid postal code"																		
+								},
+								nameshareholder1: {
+									required: "Please enter a name",					
+								},								
+								addressshareholder1: {
+									required: "Please enter a full postal address",					
+								},
+								zipcodeshareholder1: {
+									required: "Please enter a postal code",
+									pattern: "Please enter a valid postal code"																		
+								},								
+								addressshareholder2: {
+									required: "Please enter a full postal address",					
+								},
+								zipcodeshareholder2: {
+									required: "Please enter a postal code",
+									pattern: "Please enter a valid postal code"																		
+								},								
+								addressshareholder3: {
+									required: "Please enter a full postal address",					
+								},
+								zipcodeshareholder3: {
+									required: "Please enter a postal code",
+									pattern: "Please enter a valid postal code"																		
+								},
+							},
+							invalidHandler: function(form, validator) {
+								if (!validator.numberOfInvalids())
+									return;
+								validator.focusInvalid();
+							}
+						});
+						
+					}
+				});	
+				
+				
+			} else if( enquiryTypeSelected == 'D'  ){
+				$("#dsrcrta_dividand_enquiry .modal-body").html('');
+                $('#spinner-div').show();				
+                if($('.optiontype:checked').val()=='clientid') {
+					var folionumber = '';
+					var cid = $('#collection-form #cid').val();
+				} else {
+					var folionumber = $('#collection-form #folionumber').val();
+					var cid = '';
+				} 	
+                var rta_title = $('#collection-form #rta_title').val();				
+				var formData =  {'action':'upaid_dividand_enquiry','folionumber':folionumber,'cid':cid};	
+				$.ajax({
+					type: "POST",
+					url: siteURL+"/wp-admin/admin-ajax.php",
+					dataType: 'html',
+					data: formData,
+					success: function(data) {
+						$('#spinner-div').hide();
+						$("#dsrcrta_dividand_enquiry .modal-header h1").html(rta_title+' Unpaid Dividend(s)');
+						$("#dsrcrta_dividand_enquiry .modal-body").html(data);
+						$("#dsrcrta_dividand_enquiry").modal('show');
+						$("#dialog").dialog({
+							autoOpen: false,
+							open: function () {
+								var closeBtn = $('.ui-dialog-titlebar-close');
+								closeBtn.append('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
+							},
+							close: function () {
+								var closeBtn = $('.ui-dialog-titlebar-close');
+								closeBtn.html('');
+							},
+							width: '70%',
+							modal: true,
+							buttons: {
+								OK: function() {
+								  $(this).dialog("close");
+								}
+							}
+						});
+					}
+				});				
+			}
+		})
+		$(document).on('click',".inline-edit",function(){
+			$(this).parent().find('input').removeAttr('type');
+			$(this).parent().find('span').remove();
+		});
+		
+		$(document).on('click blur',"#kycupdate input",function(){
+			var type = $(this).prop('type');
+			if($(this).prop('type')=='checkbox') {
+				if($(this).is(':checked')){
+					$(this).attr('checked','checked');
+				} else {
+					$(this).removeAttr('checked');
+				}
+			} else {
+				$(this).attr('value', $(this).val());
+			}
+			
+		});
+		$(document).on('click',"#kycupdate .ifscvalidate",function(){
+			$("#ifsc").addClass('ui-autocomplete-loading');
+			var formData =  {'action':'kyc_ifsc_based_bank_details','ifsc_code':$("#ifsc").val()};
+			$.ajax({
+				type: "POST",
+				url: siteURL+"/wp-admin/admin-ajax.php",
+				dataType: 'json',
+				data: formData,
+				success: function(data) {
+					$("#ifsc").removeClass('ui-autocomplete-loading');
+					if(data.status==1){
+						$("#kycupdate #ifsc").val(data.data.IFSC);
+						$("#kycupdate #bankname").val(data.data.BANK);
+						$("#kycupdate #bankname").trigger('blur');
+						$("#kycupdate #branch").val(data.data.BRANCH);
+						$("#kycupdate #branch").trigger('blur');						
+					} else {
+						$("#kycupdate #ifsc").val('');						
+						toastr.error("Invalid IFSC code");
+					}
+				}
+			});
+		});		
+        $(document).on('click',".iepfpopup",function(){			
+			$( "#dialog" ).dialog( "open" );
+		});
+		
+		$(document).on('click',".refresh-market-summary",function(){		
+            var stockId = $("#rta_id").val();		
+			var formData =  {'action':'refresh_market_summary','stockId':stockId};
+			$.ajax({
+				type: "POST",
+				url: siteURL+"/wp-admin/admin-ajax.php",
+				dataType: 'html',
+				data: formData,
+				success: function(data) {
+					$(".marketsummary").html(data);
+				}
+			});
+		});		
+	})
+})(jQuery);	

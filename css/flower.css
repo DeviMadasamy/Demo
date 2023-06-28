@@ -1,0 +1,118 @@
+#topbar{
+    background-color: plum;
+    height: 10px;
+    width: 100%;
+}body{
+    background-color:white;
+}
+#container{
+    height: 900px;
+    width: 70%;
+    margin: 0px auto;
+}
+#header{
+    height: 90px;
+    background-color:#2e03273b;
+
+}
+#header img{
+    height: 80px;
+    border-radius: 50%;
+}
+#header ul{
+    float: right;
+    margin-top: 25px;
+}
+#header ul li{
+    display: inline;
+    margin-right: 80px;
+}
+#header ul li a{
+     color: rgb(72, 7, 133);
+     text-decoration: none; 
+     font-size: 30px;
+}
+#banner img{
+    width: 100%;
+    background-size: cover;
+    padding-bottom: 20px;
+}
+#banner img:hover{
+    background-color: rgba(232, 173, 240, 0.281);
+    transform: scale(1.03);
+    transition: all .2s ease;
+    cursor: pointer;
+}
+#banner h1{
+    color: rgb(8, 8, 8);
+    font-weight: bold;
+    font-size: 50px;
+    top: 4;
+    padding: 10px;
+    text-transform: uppercase;
+     margin-bottom: 5px;
+
+}
+#content1{
+    width: 30%;
+    height: 350px;
+    float: left;
+    margin-bottom: 4%;
+
+}
+
+#content1:hover{
+    background-color: rgba(225, 0, 255, 0.281);
+    transform: scale(1.03);
+    transition: all .2s ease;
+    cursor: pointer;}
+#content2{
+    width: 30%;
+    height: 350px;
+    float: left;
+    margin-left: 4%;
+    
+}
+#content2:hover{
+    background-color: rgba(255, 251, 0, 0.384);
+    transform: scale(1.03);
+    transition: all .2s ease;
+    cursor: pointer;}
+
+#content3{
+    width: 30%;
+    height: 350px;
+    float: left;
+    margin-left: 6%;
+}
+#content3:hover{
+    background-color: rgba(0, 255, 255, 0.315);
+    transform: scale(1.03);
+    transition: all .2s ease;
+    cursor: pointer;}
+#bottom1{
+    margin-top: 50px;
+    width: 100%;
+    background-color: rgba(19, 209, 50, 0.644);
+    height: 400px;
+    float: left;
+}
+#bottom2{
+    margin-top: 15px;
+    width: 50%;
+    background-color: rgb(68, 49, 110);
+    height: 400px;
+    float:right;
+}
+#bottom1 img{width: 500px;
+    height: 400px;
+    background-size: cover;
+    padding-bottom: 20px;
+
+}
+#bottom2 img{width: 500px;
+    height: 500px;
+    background-size: cover;
+    padding-bottom: 20px;
+
+}

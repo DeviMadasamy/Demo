@@ -1,0 +1,47 @@
+body{
+    background:linear-gradient(320deg, #04af12,#e6fa36,#fff);
+
+}.border{
+position: relative;
+}h1{
+    font-size: 45px;
+    color: aliceblue;
+    padding-left: 80px;
+    text-shadow: 0 0 25px #070653;
+}
+.content{
+    width: 500px;
+    height: 500px;
+    position: absolute;
+    top: 400px;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    padding: 200px;
+    padding-left: 500px;
+    border-color: #070653;
+}
+a{
+    text-decoration: none;
+    padding-left: 150px;
+    color: #6d0404;
+}
+.box ul li{
+    display: flex;
+}
+.content input{
+    width: 300px;
+    height: 30px;
+    background: transparent;
+    border-color: #fff;
+    color: #fff;
+    font-size: 20px;
+}
+.content button{
+    width: 250px;
+    height: 30px;
+    color:#fff;
+    background:transparent ;
+    margin-left: 20px;
+    border-color: #fff;
+
+}

@@ -1,0 +1,18 @@
+body{
+    font-family: 'Inter', sans-serif;
+    background:linear-gradient(320deg, #da3c8b,#5c6bec);
+    
+ }
+ section{
+ position: relative;
+ }
+.container{
+    width: 500px;
+    height: 500px;
+    position: absolute;
+    top: 400px;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    padding: 200px;
+    padding-left: 500px;
+ }

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/calc.css">
+    <title>calculator</title>
+</head>
+<body>
+    <section>
+    <div class="container">
+        <h2>Simple calculator</h2>
+    <form name="calc">
+        <input type="text" name="first"><br><br>
+        <input type="text" name="second"><br><br>
+        <input type="button" name="" value="ADD" onclick="ADD()">
+        <input type="button" name="" value="Subtract"onclick="Subtract()">
+        <input type="button" name="" value="Multiply"onclick="Multiply()">
+        <input type="button" name="" value="Modul"onclick="Modul()">
+        <input type="button" name="" value="Divide"onclick="Divide()"><br><br>
+        <input type="text" name="result">
+    </form>
+    <script>
+        function ADD(){
+     first=parseInt(calc.first.value);
+     second=parseInt(calc.second.value);
+    result=first+second;
+    calc.result.value=result;
+    calc.result.value= first+second;
+        }
+        function Subtract(){
+     first=parseInt(calc.first.value);
+     second=parseInt(calc.second.value);
+    result=first+second;
+    calc.result.value=result;
+    calc.result.value= first-second;
+        }
+        function Multiply(){
+     first=parseInt(calc.first.value);
+     second=parseInt(calc.second.value);
+    result=first+second;
+    calc.result.value=result;
+    calc.result.value= first*second;
+        }
+        function Divide(){
+     first=parseInt(calc.first.value);
+     second=parseInt(calc.second.value);
+    result=first+second;
+    calc.result.value=result;
+    calc.result.value= first/second;
+        }
+        function Modul(){
+     first=parseInt(calc.first.value);
+     second=parseInt(calc.second.value);
+    result=first+second;
+    calc.result.value=result;
+    calc.result.value= first%second;
+        }
+   </script>
+    </div>
+</section>
+</body>
+</html>

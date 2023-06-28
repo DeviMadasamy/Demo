@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="stylesheet" href="./css/style.css">
+   <title>Document</title>
+</head>
+
+<style>
+ </style>
+
+ <input type="text" id="texts">
+ <button onclick="CheckChar()">CheckText</button>
+
+  <h1 id="resdata"></h1>
+<body>
+   <script>
+       
+       function CheckChar(){
+         var vals = document.getElementById('texts').value;           
+           var cases = "";
+         for(var i = 0; i<vals.length;i++){
+             cases = cases + `${vals[i].toUpperCase() === vals[i] ? vals[i].toLowerCase() : vals[i].toUpperCase() }`;
+         } else{
+            var type= casestoUpperCase==true,cases==toLowerCase==false;          
+         }        
+         document.getElementById('resdata').innerHTML = type;
+       }
+    
+   </script>
+</body>
+
+</html>

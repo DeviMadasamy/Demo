@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <script src="https://use.fontawesome.com/f6cbbd95d7.js"></script> -->
+    <script src="./fontsicon.js"></script>
+    <script src="./scripts/script.js"></script>
+    <title>color changeColor</title>
+  </head>
+  <style>
+    .box {
+        width: 200px;
+        height: 200px;
+        background-color: red;        
+    }
+    .bggreen{
+         background-color: green;
+    }
+  </style>
+  <body>
+
+   <div class="box">
+   </div>
+    <button onclick="changeColor()">Change Color</button>
+    <div class="box">
+   </div>
+    <button onclick="changeColor()">Change Color</button>
+
+    <script>
+        function changeColor(){
+          var box = document.querySelector('.box').classList.toggle('bggreen');
+        }
+    </script>
+  </body>
+</html>

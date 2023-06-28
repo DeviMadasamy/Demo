@@ -1,0 +1,12 @@
+body{
+    background-color: rgb(183, 183, 223);
+}
+.box{
+    max-width: 400px;
+    margin: 0 auto;
+}
+#Country{
+    padding: 6px 50px;
+    background-color: rgba(236, 103, 176, 0.288);
+    color: rgb(163, 11, 11);
+}

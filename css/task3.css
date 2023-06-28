@@ -1,0 +1,16 @@
+.img-section{
+    position: relative;
+}
+.img-section img{
+    height: 100%;
+    width: 100%;
+}
+.content{
+    position: absolute;
+    top: 40%;
+    transform: translate(-50%,-50%);
+    left:50%;
+    color: rgb(77, 8, 141);
+    text-shadow: 0 0 50px #e24ae7;
+    font-size: 50px;
+}

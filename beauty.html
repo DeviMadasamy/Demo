@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!----> <link rel="stylesheet" type="text/css" href="css/beauty.css">-->
+   <title>task1</title>
+</head>
+<body>
+<div class="box">
+    <div class="boxtwo">
+ <table id="mytable"> <br><br>   
+ </table>
+ <button onclick="chennaiFun()">one</button>
+ <button onclick="trichyFun()">TRICHY</button>
+</div>
+</div>
+   <script>   
+       var sampleData = [
+         {id:1, imgLink:"", imgname:"one"},
+         {id:2, imgLink:"http:/wwww.xyz.com/images/one.png", imgname:"two"},
+         {id:3, imgLink:"http:/wwww.xyz.com/images/one.jpg", imgname:"three"},
+         {id:4, imgLink:"http:/wwww.xyz.com/images/one.png", imgname:"four"},
+         {id:5, imgLink:"http:/wwww.xyz.com/images/one.jpg", imgname:"five"},
+         {id:6, imgLink:"http:/wwww.xyz.com/images/one.png", imgname:"one"},
+         {id:7, imgLink:"http:/wwww.xyz.com/images/one.jpg", imgname:"one"},
+         {id:8, imgLink:"http:/wwww.xyz.com/images/one.ong", imgname:"one"},
+         {id:9, imgLink:"http:/wwww.xyz.com/images/one.jpg", imgname:"one"},
+         {id:10, imgLink:"http:/wwww.xyz.com/images/one.ong", imgname:"one"},
+         {id:11, imgLink:"http:/wwww.xyz.com/images/one.jpg", imgname:"one"},
+         
+       ]
+
+       function chennaiFun(){
+       var res = sampleData.filter((data)=>{
+            return data.address == "chennai"
+       })
+       var out = "";
+       for(var i = 0; i<res.length;i++){
+            out = out + `<tr>`;
+            out = out + `<td>${res[i].stdname}</td>`;
+            out = out + `<td>${res[i].address}</td>`;
+            out = out + `<td>${res[i].role}</td>`;
+            out = out + `<td>${res[i].isfulltime}</td>`;
+            out = out + `</tr>`;
+       }
+       document.getElementById("mytable").innerHTML = out;
+      }
+
+      
+      function trichyFun(){
+       var res = sampleData.filter((data)=>{
+            return data.address == "Trichy"
+       })
+       var out = "";
+       for(var i = 0; i<res.length;i++){
+            out = out + `<tr>`;
+            out = out + `<td>${res[i].stdname}</td>`;
+            out = out + `<td>${res[i].address}</td>`;
+            out = out + `<td>${res[i].role}</td>`;
+            out = out + `<td>${res[i].isfulltime}</td>`;
+            out = out + `</tr>`;
+       }
+       document.getElementById("mytable").innerHTML = out;
+      }
+
+        
+   </script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+ }
+ .main-box {
+    position: relative;
+ }
+
+ .inner-box{
+    position: fixed;
+    background-image: url("../images/test3.webp");
+    height: 200px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    bottom: -200px;
+    width: 100%;
+    transition: all .5s ease-in;
+ }
+ .showcookies{
+    bottom: 0;
+    transition: all .5s ease-in;
+ }h1{
+    margin-left: 600px;
+    font-size: 50px;
+    text-shadow: 0 0 10px #14dd0d;
+ }
